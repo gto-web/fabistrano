@@ -12,7 +12,7 @@ def prepare_for_checkout():
         'git_clone': env.git_clone, 'git_branch': env.git_branch,
     }
     commit_hash = local(git_cmd, capture=True).split('\t')[0]
-    env.commit_hash = commit_hash
+    env.commit_hash_cache = commit_hash[:15] + "_" + env.user
     env.current_revision = datetime.now().strftime('%Y%m%d_%H%M%S_') + commit_hash[:7]
     env.current_release = '%(releases_path)s/%(current_revision)s' % {
         'releases_path': env.releases_path, 'current_revision': env.current_revision,
@@ -26,7 +26,7 @@ def remote_clone():
     prepare_for_checkout()
     
     # start
-    cache_name = 'code_%s.tar.bz2' % env.commit_hash[:15]
+    cache_name = 'code_%s.tar.bz2' % env.commit_hash_cache
     
     local_cache = '/tmp/'+cache_name
     
@@ -52,7 +52,7 @@ def local_clone():
     prepare_for_checkout()
     
     # start
-    cache_name = 'code_%s.tar.bz2' % env.commit_hash[:15]
+    cache_name = 'code_%s.tar.bz2' % env.commit_hash_cache
     
     local_cache = '/tmp/' + cache_name
 
@@ -167,7 +167,7 @@ def localcopy():
     prepare_for_checkout()
     
     # start
-    cache_name = 'code_%s.tar.bz2' % env.commit_hash[:15]
+    cache_name = 'code_%s.tar.bz2' % env.commit_hash_cache
     
     cmd = ('cp -rf %(localcopy_path)s /tmp/%(cache_name)s && '
            'cd /tmp/ && tar cvzf %(cache_name)s.tar.gz %(cache_name)s') % {
